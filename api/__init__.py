@@ -16,3 +16,4 @@ manager.add_command("db", MigrateCommand)
 csrf = CSRFProtect()
 csrf.init_app(app)
 from api.view import *
+from api.model import *

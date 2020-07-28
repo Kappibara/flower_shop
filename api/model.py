@@ -8,12 +8,12 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import enum
 
-product_category = db.Table(
+product_category = db.Table('product_category',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
     db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
 )
 
-product_flower = db.Table(
+product_flower = db.Table('product_flower',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
     db.Column('flower_id', db.Integer, db.ForeignKey('flower.id'), primary_key=True)
 )
@@ -37,11 +37,11 @@ class Gender(enum.Enum):
 
 class Product(db.Model):
     __tablename__ = 'products'
-    product_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     image_url = db.Column(db.String(255))
     price = db.Column(db.DECIMAL)
     title = db.Column(db.String(255))
-    description = db.Computed(db.Text, default="")
+    # description = db.Computed(db.Text, default="")
     ingredients = db.relationship('Flower', secondary=product_flower, lazy='subquery',
                                   backref=db.backref('product', lazy=True))
     categories = db.relationship('Category', secondary=product_category, lazy='subquery',
@@ -66,7 +66,7 @@ class Order(db.Model):
     user_name = db.Column(db.String(255))
     phone = db.Column(db.String(20))
     address = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
 class User(db.Model):
@@ -112,7 +112,7 @@ class News(db.Model):
     sub_title = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     body = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
 class Category(db.Model):
