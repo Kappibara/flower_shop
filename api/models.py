@@ -3,9 +3,7 @@ from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from api import db, app
-from sqlalchemy.dialects.postgresql import UUID
 
-import uuid
 import enum
 
 product_category = db.Table(
@@ -60,7 +58,7 @@ class UserAddress(db.Model):
 
 
 class Order(db.Model):
-    order_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     order_price = db.Column(db.DECIMAL)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     payment_method = db.Column(db.Enum(PaymentMethod))
