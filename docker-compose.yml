@@ -11,26 +11,26 @@ services:
 
     depends_on:
       - database
-  migration:
-    build: .
-    command: >
-      sh -c "python manage.py db init &&
-            python manage.py db migrate &&
-            python manage.py db upgrade"
-    links:
-      - database
-    depends_on:
-      - api
-      - database
-  database:
-    image: postgres:10-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: flower_shop
-      PGDATA: /var/lib/postgresql/data
-    ports:
-      - 5433:5432
-#    volumes:
-#      - /var/lib/postgresql/10/main:/var/lib/postgresql/data
-    restart: always
+#  migration:
+#    build: .
+#    command: >
+#      sh -c "python manage.py db init &&
+#            python manage.py db migrate &&
+#            python manage.py db upgrade"
+#    links:
+#      - database
+#    depends_on:
+#      - api
+#      - database
+#  database:
+#    image: postgres:10-alpine
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: flower_shop
+#      PGDATA: /var/lib/postgresql/data
+#    ports:
+#      - 5433:5432
+##    volumes:
+##      - /var/lib/postgresql/10/main:/var/lib/postgresql/data
+#    restart: always
