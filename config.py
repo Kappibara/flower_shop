@@ -6,7 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Configuration:
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get("DATABASE_URL")
-        or "postgres://postgres:ghbdtnvbh@localhost:5432/flower_shop"
+        or "postgresql://postgres:postgres@localhost:5432/flower_shop"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CSRF_ENABLED = True
