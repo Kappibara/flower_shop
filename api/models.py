@@ -8,12 +8,14 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import enum
 
-product_category = db.Table('product_category',
+product_category = db.Table(
+    'product_category',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
     db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
 )
 
-product_flower = db.Table('product_flower',
+product_flower = db.Table(
+    'product_flower',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
     db.Column('flower_id', db.Integer, db.ForeignKey('flower.id'), primary_key=True)
 )
@@ -37,11 +39,11 @@ class Gender(enum.Enum):
 
 class Product(db.Model):
     __tablename__ = 'products'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = db.Column(db.Integer, primary_key=True)
     image_url = db.Column(db.String(255))
     price = db.Column(db.DECIMAL)
     title = db.Column(db.String(255))
-    # description = db.Computed(db.Text, default="")
+    description = db.Column(db.Text, default='')
     ingredients = db.relationship('Flower', secondary=product_flower, lazy='subquery',
                                   backref=db.backref('product', lazy=True))
     categories = db.relationship('Category', secondary=product_category, lazy='subquery',
@@ -118,7 +120,7 @@ class News(db.Model):
 class Category(db.Model):
     __tablename__ = 'categories'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
 
 
