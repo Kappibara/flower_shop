@@ -22,6 +22,8 @@ product_flower = db.Table(
 class Role(enum.Enum):
     ADMIN = 0
     USER = 1
+    OPERATOR = 2
+    COPYWRITER = 3
 
 
 class PaymentMethod(enum.Enum):
@@ -79,10 +81,11 @@ class User(db.Model):
     phone = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False)
-    role = db.Column(db.Enum(Role), nullable=False)
-    addresses = db.relationship('UserAddresses', back_populates='user')
+    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
+    role = db.Column(db.Enum(Role), nullable=False, default=Role.USER)
+    addresses = db.relationship('UserAddress', backref='user')
     orders = db.relation('Order', backref='user', lazy=True)
+    password_hash = db.Column(db.String(255))
     # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     # role = db.Column('Role', back_populates='users')
 
