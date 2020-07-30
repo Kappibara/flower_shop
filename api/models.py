@@ -86,6 +86,7 @@ class User(db.Model):
     addresses = db.relationship('UserAddress', backref='user')
     orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
+    favourite = db.Column(db.ARRAY(db.Integer))
     # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     # role = db.Column('Role', back_populates='users')
 
