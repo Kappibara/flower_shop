@@ -19,12 +19,5 @@ manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 # csrf = CSRFProtect()
 # csrf.init_app(app)
-from api.models import *
-from api.controllers import *
-from api.controllers import MainHandler, LoginHandler, RegistrationHandler
-
-api.add_resource(MainHandler, '/')
-api.add_resource(LoginHandler, '/login')
-api.add_resource(RegistrationHandler, '/registration')
-
-
+from api import routes
+from api import controllers

@@ -1,7 +1,8 @@
-from flask_restful import Api
-from api import app
-from api.controllers import MainHandler
-
-api = Api(app)
+from api import api
+from api.controllers import (
+    MainHandler, LoginHandler, RegistrationHandler
+)
 
 api.add_resource(MainHandler, '/')
+api.add_resource(LoginHandler, '/login')
+api.add_resource(RegistrationHandler, '/registration')

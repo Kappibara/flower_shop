@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from api import db, app
+from sqlalchemy.dialects import postgresql
+from api import db
 
 import enum
 
@@ -50,20 +50,11 @@ class Product(db.Model):
                                  backref=db.backref('products', lazy=True))
 
 
-class UserAddress(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    city = db.Column(db.String(100))
-    street = db.Column(db.String(200))
-    house = db.Column(db.Integer)
-    flat = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-
 class Order(db.Model):
     order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    order_price = db.Column(db.DECIMAL)
+    order_price = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    payment_method = db.Column(db.Enum(PaymentMethod))
+    payment_method = db.Column('payment_method', postgresql.ENUM(PaymentMethod.CASH.name, PaymentMethod.LIQPAY.name, PaymentMethod.APPLEPAY.name, name=PaymentMethod.CASH.name, create_type=False))
     comment = db.Column(db.Text)
     user_name = db.Column(db.String(255))
     phone = db.Column(db.String(20))
@@ -77,13 +68,13 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(255), nullable=False)
-    gender = db.Column(db.Enum(Gender))
+    gender = db.Column('gender', postgresql.ENUM(Gender.MALE.name, Gender.FEMALE.name, name='пол', create_type=False))
     phone = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    role = db.Column(db.Enum(Role), nullable=False, default=Role.USER)
-    addresses = db.relationship('UserAddress', backref='user')
+    role = db.Column('role', postgresql.ENUM(Role.ADMIN.name, Role.OPERATOR.name, Role.COPYWRITER.name, name='role2', create_type=False))
+    addresses = db.Column(postgresql.JSONB)
     orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
     favourite = db.Column(db.ARRAY(db.Integer))

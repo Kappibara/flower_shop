@@ -1,8 +1,13 @@
-from flask_restful import Resource
 from flask import request
-from api.models import Product, User
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
+)
+from flask_restful import Resource
+
 from api import db
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from api.models import Product, User
 
 
 class MainHandler(Resource):
@@ -18,7 +23,6 @@ class MainHandler(Resource):
     @jwt_required
     def post(self):
         user = get_jwt_identity()
-        print(user)
         return {'hello': "My friend, {}".format(user)}
 
 
