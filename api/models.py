@@ -69,17 +69,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(255), nullable=False)
     gender = db.Column('gender', postgresql.ENUM(Gender, name='GENDER', create_type=False))
-    phone = db.Column(db.String(255), unique=True, nullable=False)
+    # phone = db.Column(db.String(255), unique=True, nullable=False)
+    # Делал эксперементы с наполнением базы
+    phone = db.Column(db.String(255), unique=False, nullable=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    role = db.Column('role', postgresql.ENUM(Role, name='ROLE', create_type=False))
-    addresses = db.Column(postgresql.JSONB)
+    role = db.Column('role', postgresql.ENUM(Role, name='ROLE', create_type=False), server_default=Role.USER.name)
+    addresses = db.Column(postgresql.JSON)
     orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
-    favourite = db.Column(db.ARRAY(db.Integer))
-    # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    # role = db.Column('Role', back_populates='users')
+    # TODO rename favourites
+    favourites = db.Column(db.ARRAY(db.Integer))
 
     @property
     def password(self):

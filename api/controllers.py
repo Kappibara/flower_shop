@@ -58,12 +58,35 @@ class RegistrationHandler(Resource):
         try:
             user = User(**data)
         except Exception as e:
-            return {"error": "Wrong data"}
+            return {"error": "Wrong data", "message": e}
         db.session.add(user)
         try:
             db.session.commit()
         except Exception as e:
+            # TODO сделать разные обработки ошибок
             return {"error": "Not unique"}
         token = create_access_token(identity=user.username)
         return {"token": token}
+
+
+class Favourites(Resource):
+
+    @jwt_required
+    def post(self):
+        data = request.get_json()
+        username = get_jwt_identity()
+        print(username)
+        u = User.query.filter(User.username == username).scalar()
+        print(u)
+        print(u)
+        print(u)
+        print(u.favourite)
+        # if u.favourite is None:
+
+        # u.favourite = u.favourite.append(data['favourite_id'])
+        u.favourite = [1]
+        db.session.add(u)
+        db.session.commit()
+        return {}
+    
 
