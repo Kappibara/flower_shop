@@ -8,4 +8,5 @@ RUN pip install -r requirements.txt
 RUN python manage.py db init
 ENV DATABASE_URL postgres://postgres:postgres@database:5432/flower_shop
 ENV FLASK_APP=run.py
+ENV FLASK_DEBUG=1
 EXPOSE 5000
