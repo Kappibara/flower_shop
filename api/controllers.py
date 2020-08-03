@@ -7,14 +7,15 @@ from flask_jwt_extended import (
 from flask_restful import Resource
 
 from api import db
-from api.models import Product, User
+from api.models import Products, Users
+from api.utils import is_int, serialize_product
 
 
 class MainHandler(Resource):
 
     def get(self):
-        products = Product.query.filter(Product.id > 0).order_by(Product.id).limit(3).with_entities(
-            Product.id, Product.image_url, Product.description).all()
+        products = Products.query.filter(Products.id > 0).order_by(Products.id).limit(3).with_entities(
+            Products.id, Products.image_url, Products.description).all()
         result = {}
         for product in products:
             result[product[0]] = {"image_url": product[1], "description": product[2]}
@@ -29,14 +30,14 @@ class MainHandler(Resource):
 class LoginHandler(Resource):
     def post(self):
         data = request.get_json()
-        user = User.query.filter(User.username == data.get("username", "")).first_or_404()
+        user = Users.query.filter(Users.username == data.get("username", "")).first_or_404()
         if user and user.verify_password(data.get("password", "")):
             access_token = create_access_token(identity=user.username)
             return {"token": access_token}
         return {"error": "wrong credentials"}
 
     def get(self):
-        user = User(username='test', gender="MALE", phone="1231", email="test@gmail.com", password="test", role="ADMIN")
+        user = Users(username='test', gender="MALE", phone="1231", email="test@gmail.com", password="test", role="ADMIN")
         db.session.add(user)
         try:
             db.session.commit()
@@ -56,7 +57,7 @@ class RegistrationHandler(Resource):
         """
         data = request.get_json()
         try:
-            user = User(**data)
+            user = Users(**data)
         except Exception as e:
             return {"error": "Wrong data", "message": e}
         db.session.add(user)
@@ -76,7 +77,7 @@ class Favourites(Resource):
         data = request.get_json()
         username = get_jwt_identity()
         print(username)
-        u = User.query.filter(User.username == username).scalar()
+        u = Users.query.filter(Users.username == username).scalar()
         print(u)
         print(u)
         print(u)
@@ -88,5 +89,24 @@ class Favourites(Resource):
         db.session.add(u)
         db.session.commit()
         return {}
-    
+
+    def get(self):
+        # username = get_jwt_identity()
+        pass
+
+
+
+
+class GetProducts(Resource):
+
+    def get(self):
+        data = request.get_json()
+        if is_int(data):
+            products = Products.query.offset(data['offset']).limit(data['limit'])
+            return {'products': [serialize_product(p) for p in products]}
+        return {
+            "errors": "offset and limit must be integer",
+            "code": 401
+        }
+
 

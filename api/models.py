@@ -15,7 +15,7 @@ product_category = db.Table(
 product_flower = db.Table(
     'product_flower',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
-    db.Column('flower_id', db.Integer, db.ForeignKey('flower.id'), primary_key=True)
+    db.Column('flower_id', db.Integer, db.ForeignKey('flowers.id'), primary_key=True)
 )
 
 
@@ -37,24 +37,24 @@ class Gender(enum.Enum):
     FEMALE = 1
 
 
-class Product(db.Model):
+class Products(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     image_url = db.Column(db.String(255))
     price = db.Column(db.DECIMAL)
     title = db.Column(db.String(255))
     description = db.Column(db.Text, default='')
-    ingredients = db.relationship('Flower', secondary=product_flower, lazy='subquery',
-                                  backref=db.backref('product', lazy=True))
-    categories = db.relationship('Category', secondary=product_category, lazy='subquery',
+    ingredients = db.relationship('Flowers', secondary=product_flower, lazy='subquery',
+                                  backref=db.backref('products', lazy=True))
+    categories = db.relationship('Categories', secondary=product_category, lazy='subquery',
                                  backref=db.backref('products', lazy=True))
 
 
-class Order(db.Model):
+class Orders(db.Model):
     order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     order_price = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    payment_method = db.Column('payment_method', postgresql.ENUM(PaymentMethod, name='PAYMENT_METHOD', create_type=False))
+    payment_method = db.Column('payment_method', postgresql.ENUM(PaymentMethod, name='PAYMENT_METHODS', create_type=False))
     comment = db.Column(db.Text)
     user_name = db.Column(db.String(255))
     phone = db.Column(db.String(20))
@@ -62,23 +62,22 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
-class User(db.Model):
+class Users(db.Model):
     """ User Model for storing user related details """
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(255), nullable=False)
-    gender = db.Column('gender', postgresql.ENUM(Gender, name='GENDER', create_type=False))
+    gender = db.Column('gender', postgresql.ENUM(Gender, name='GENDERS', create_type=False))
     # phone = db.Column(db.String(255), unique=True, nullable=False)
     # Делал эксперементы с наполнением базы
     phone = db.Column(db.String(255), unique=False, nullable=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    role = db.Column('role', postgresql.ENUM(Role, name='ROLE', create_type=False), server_default=Role.USER.name)
+    role = db.Column('role', postgresql.ENUM(Role, name='ROLES', create_type=False), server_default=Role.USER.name)
     addresses = db.Column(postgresql.JSON)
-    orders = db.relation('Order', backref='user', lazy=True)
+    orders = db.relation('Orders', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
-    # TODO rename favourites
     favourites = db.Column(db.ARRAY(db.Integer))
 
     @property
@@ -110,14 +109,16 @@ class News(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
-class Category(db.Model):
+class Categories(db.Model):
     __tablename__ = 'categories'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
 
 
-class Flower(db.Model):
+class Flowers(db.Model):
+    __tablename__ = 'flowers'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
 
