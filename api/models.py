@@ -4,10 +4,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.dialects import postgresql
 from api import db
 
-from api import db, app
-from sqlalchemy.dialects.postgresql import UUID
-
-import uuid
 import enum
 
 product_category = db.Table(
