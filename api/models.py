@@ -67,7 +67,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), unique=True, nullable=False)
     gender = db.Column('gender', postgresql.ENUM(Gender, name='GENDER', create_type=False))
     phone = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
@@ -78,6 +78,7 @@ class User(db.Model):
     orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
     favourite = db.Column(db.ARRAY(db.Integer))
+    jwt_token = db.Column(db.String(255), unique=True)
     # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     # role = db.Column('Role', back_populates='users')
 
@@ -122,7 +123,7 @@ class Flower(db.Model):
     name = db.Column(db.String(255), unique=True, nullable=False)
 
 
-class Metadata(db.Model):
+class MetadataConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     call_center_phone = db.Column(db.String(20))
     locations = db.Column(db.ARRAY(db.String))
