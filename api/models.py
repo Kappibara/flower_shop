@@ -15,7 +15,7 @@ product_category = db.Table(
 product_flower = db.Table(
     'product_flower',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id'), primary_key=True),
-    db.Column('flower_id', db.Integer, db.ForeignKey('flowers.id'), primary_key=True)
+    db.Column('flower_id', db.Integer, db.ForeignKey('flower.id'), primary_key=True)
 )
 
 
@@ -37,24 +37,24 @@ class Gender(enum.Enum):
     FEMALE = 1
 
 
-class Products(db.Model):
+class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     image_url = db.Column(db.String(255))
     price = db.Column(db.DECIMAL)
     title = db.Column(db.String(255))
     description = db.Column(db.Text, default='')
-    ingredients = db.relationship('Flowers', secondary=product_flower, lazy='subquery',
-                                  backref=db.backref('products', lazy=True))
-    categories = db.relationship('Categories', secondary=product_category, lazy='subquery',
+    ingredients = db.relationship('Flower', secondary=product_flower, lazy='subquery',
+                                  backref=db.backref('product', lazy=True))
+    categories = db.relationship('Category', secondary=product_category, lazy='subquery',
                                  backref=db.backref('products', lazy=True))
 
 
-class Orders(db.Model):
+class Order(db.Model):
     order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     order_price = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    payment_method = db.Column('payment_method', postgresql.ENUM(PaymentMethod, name='PAYMENT_METHODS', create_type=False))
+    payment_method = db.Column('payment_method', postgresql.ENUM(PaymentMethod, name='PAYMENT_METHOD', create_type=False))
     comment = db.Column(db.Text)
     user_name = db.Column(db.String(255))
     phone = db.Column(db.String(20))
@@ -62,23 +62,27 @@ class Orders(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
-class Users(db.Model):
+class User(db.Model):
     """ User Model for storing user related details """
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), nullable=False)
+    username = db.Column(db.String(255), unique=True, nullable=False)
     gender = db.Column('gender', postgresql.ENUM(Gender, name='GENDERS', create_type=False))
     # phone = db.Column(db.String(255), unique=True, nullable=False)
     # Делал эксперементы с наполнением базы
     phone = db.Column(db.String(255), unique=False, nullable=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
-    role = db.Column('role', postgresql.ENUM(Role, name='ROLES', create_type=False), server_default=Role.USER.name)
-    addresses = db.Column(postgresql.JSON)
-    orders = db.relation('Orders', backref='user', lazy=True)
+    password = db.Column(db.String(255), nullable=False)
+    registered_on = db.Column(db.DateTime, nullable=False)
+    role = db.Column(db.Enum(Role), nullable=False)
+    addresses = db.Column(postgresql.JSONB)
+    orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
     favourites = db.Column(db.ARRAY(db.Integer))
+    jwt_token = db.Column(db.String(255), unique=True)
+    # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    # role = db.Column('Role', back_populates='users')
 
     @property
     def password(self):
@@ -109,21 +113,21 @@ class News(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
-class Categories(db.Model):
+class Category(db.Model):
     __tablename__ = 'categories'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
 
 
-class Flowers(db.Model):
+class Flower(db.Model):
     __tablename__ = 'flowers'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
 
 
-class Metadata(db.Model):
+class MetadataConfig(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     call_center_phone = db.Column(db.String(20))
     locations = db.Column(db.ARRAY(db.String))
