@@ -78,7 +78,7 @@ class User(db.Model):
     orders = db.relation('Order', backref='user', lazy=True)
     password_hash = db.Column(db.String(255))
     favourite = db.Column(db.ARRAY(db.Integer))
-    jwt_token = db.Column(db.String(255), unique=True)
+    jwt_token = db.Column(db.Text)
     # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     # role = db.Column('Role', back_populates='users')
 

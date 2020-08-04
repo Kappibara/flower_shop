@@ -29,9 +29,15 @@ class MainHandler(Resource):
 class LoginHandler(Resource):
     def post(self):
         data = request.get_json()
-        user = User.query.filter(User.username == data.get("username", "")).first_or_404()
+        user_row = User.query.filter(User.username == data.get("username", ""))
+        user = user_row.first_or_404()
         if user and user.verify_password(data.get("password", "")):
             access_token = create_access_token(identity=user.username)
+            user_row.update({"jwt_token": access_token})
+            try:
+                db.session.commit()
+            except Exception as e:
+                access_token = "Something went wrong"
             return {"token": access_token}
         return {"error": "wrong credentials"}
 
@@ -59,11 +65,12 @@ class RegistrationHandler(Resource):
             user = User(**data)
         except Exception as e:
             return {"error": "Wrong data"}
+        token = create_access_token(identity=user.username)
+        user.jwt_token = token
         db.session.add(user)
         try:
             db.session.commit()
         except Exception as e:
             return {"error": "Not unique"}
-        token = create_access_token(identity=user.username)
         return {"token": token}
 
