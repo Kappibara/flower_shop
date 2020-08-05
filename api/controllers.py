@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, url_for
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -6,7 +6,9 @@ from flask_jwt_extended import (
 )
 from flask_restful import Resource
 
-from api import db
+from api import db, oauth, app
+from flask.json import jsonify
+
 from api.models import Product, User
 
 
@@ -74,3 +76,16 @@ class RegistrationHandler(Resource):
             return {"error": "Not unique"}
         return {"token": token}
 
+    def get(self):
+        redirect_uri = url_for('auth', _external=True)
+        print(redirect_uri)
+        return oauth.google.authorize_redirect(redirect_uri, scope="email")
+
+
+@app.route("/google/callback")
+def auth():
+    token = oauth.google.authorize_access_token()
+    tok = token["id_token"]
+    res = oauth.google.get("tokeninfo?id_token={}".format(tok))
+    profile = res.json()
+    return jsonify({"result": profile["email"]})
